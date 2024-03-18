@@ -1,0 +1,25 @@
+---
+- hosts: all
+  tasks:
+    - name: Captured .pcap file copy from cnode to mnode
+      fetch:
+        src: /home/tendencia/Desktop/captured.pcap
+        dest: /home/tendencia/HOA8/
+        flat: yes
+
+- hosts: cnode
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Extraction of executable file
+      command: tcpflow -r /home/tendencia/HOA8/captured.pcap -o /home/tendencia/HOA8
+      args:
+        creates: /home/tendencia/HOA8/executable.exe
+
+    - name: Debug.exe file
+      command: cat /home/tendencia/HOA8/report.xml
+      register: cat_output
+      changed_when: false
+
+    - debug:
+        var: cat_output.stdout_lines
